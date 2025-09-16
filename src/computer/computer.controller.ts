@@ -11,6 +11,7 @@ import { ComputerService } from './computer.service';
 import { CreateComputerDto } from './dto/create-computer.dto';
 import { Computer } from './schemas/computer.schema';
 import { UpdateComputerDto } from './dto/update-computer.dto';
+import { CreatePerifericoDto } from 'src/perifericos/dto/create-periferico.dto';
 
 @Controller('computer')
 export class ComputerController {
@@ -46,12 +47,13 @@ export class ComputerController {
     return this.computerService.delete(id);
   }
 
-  @Post(':computadorId/perifericos/:perifericoId')
+  // agora pode criar varios perifericos com um id do computer
+  @Post(':computerId/perifericos')
   async addPeriferico(
-    @Param('computadorId') computerId: string,
-    @Param('perifericoId') perifericoId: string,
+    @Param('computerId') computerId: string,
+    @Body() createPerifericoDto: CreatePerifericoDto,
   ) {
-    return this.computerService.addPeriferico(computerId, perifericoId);
+    return this.computerService.addPeriferico(computerId, createPerifericoDto);
   }
 
   @Delete(':computadorId/perifericos/:perifericoId')

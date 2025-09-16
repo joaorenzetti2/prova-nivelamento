@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { Periferico } from 'src/perifericos/schemas/periferico.schema';
 
 export type ComputerDocument = HydratedDocument<Computer>;
 
@@ -15,7 +14,11 @@ export class Computer {
   @Prop()
   dataFabricacao: number;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Periferico' })
-  perifericos: Periferico[];
+  @Prop({
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: 'Periferico',
+    default: [], // inicializa o periferico como array vazio
+  })
+  perifericos: mongoose.Types.ObjectId[];
 }
 export const ComputerSchema = SchemaFactory.createForClass(Computer);

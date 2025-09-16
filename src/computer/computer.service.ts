@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { CreateComputerDto } from './dto/create-computer.dto';
 import { UpdateComputerDto } from './dto/update-computer.dto';
 import { Periferico } from 'src/perifericos/schemas/periferico.schema';
+import { CreatePerifericoDto } from 'src/perifericos/dto/create-periferico.dto';
 
 @Injectable()
 export class ComputerService {
@@ -65,29 +66,23 @@ export class ComputerService {
 
   async addPeriferico(
     computerId: string,
-    perifericoId: string,
+    createPerifericoDto: CreatePerifericoDto,
   ): Promise<Computer> {
     const computer = await this.computerModel.findById(computerId).exec();
-    const periferico = await this.perifericoModel.findById(perifericoId).exec();
 
     if (!computer) {
       throw new NotFoundException('Computador não encontrado.');
     }
-    if (!periferico) {
-      throw new NotFoundException('Periférico não encontrado.');
-    }
 
-    // atualiza o computer com o novo periferico
-    const updatedComputer = await this.computerModel
+    const periferico = await this.perifericoModel.create(createPerifericoDto);
+    computer.perifericos.push(periferico._id);
+    await computer.save();
+
+    return this.computerModel
       .findById(computerId)
       .populate('perifericos')
+      .orFail(new NotFoundException(`Computador não encontrado`))
       .exec();
-
-    if (!updatedComputer) {
-      throw new NotFoundException('Computador não encontrado.');
-    }
-
-    return updatedComputer;
   }
 
   async removePeriferico(
@@ -105,6 +100,11 @@ export class ComputerService {
     );
     await computer.save();
 
-    return computer;
+    // retorna o computador e se caso não achar lança a exception
+    return this.computerModel
+      .findById(computerId)
+      .populate('perifericos')
+      .orFail(new NotFoundException(`Computador não encontrado`))
+      .exec();
   }
 }
