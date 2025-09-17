@@ -100,6 +100,8 @@ export class ComputerService {
     );
     await computer.save();
 
+    await this.perifericoModel.findByIdAndDelete(perifericoId).exec();
+
     // retorna o computador e se caso não achar lança a exception
     return this.computerModel
       .findById(computerId)
